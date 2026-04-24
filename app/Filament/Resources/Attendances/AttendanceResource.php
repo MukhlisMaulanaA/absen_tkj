@@ -14,55 +14,63 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AttendanceResource extends Resource
 {
-    protected static ?string $model = Attendance::class;
+  protected static ?string $model = Attendance::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+  protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'attendance';
+  protected static ?string $recordTitleAttribute = 'attendance';
 
-    public static function form(Schema $schema): Schema
-    {
-        return AttendanceForm::configure($schema);
-    }
+  public static function form(Schema $schema): Schema
+  {
+    return AttendanceForm::configure($schema);
+  }
 
-    public static function infolist(Schema $schema): Schema
-    {
-        return AttendanceInfolist::configure($schema);
-    }
+  public static function infolist(Schema $schema): Schema
+  {
+    return AttendanceInfolist::configure($schema);
+  }
 
-    public static function table(Table $table): Table
-    {
-        return AttendancesTable::configure($table);
-    }
+  public static function table(Table $table): Table
+  {
+    // Tambahkan di dalam array columns:
+    ImageColumn::make('check_in_image')
+    ->label('Selfie Masuk')
+    ->circular() // Membuat gambar jadi bulat seperti avatar
+    ->toggleable(); // Agar admin bisa sembunyikan kolom jika tabel terlalu penuh
+    
+    return AttendancesTable::configure($table);
+    
+  }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
+  public static function getRelations(): array
+  {
+    return [
+      //
+    ];
+  }
 
-    public static function getPages(): array
-    {
-        return [
-            'index' => ListAttendances::route('/'),
-            'create' => CreateAttendance::route('/create'),
-            'view' => ViewAttendance::route('/{record}'),
-            'edit' => EditAttendance::route('/{record}/edit'),
-        ];
-    }
+  public static function getPages(): array
+  {
+    return [
+      'index' => ListAttendances::route('/'),
+      'create' => CreateAttendance::route('/create'),
+      'view' => ViewAttendance::route('/{record}'),
+      'edit' => EditAttendance::route('/{record}/edit'),
+    ];
+  }
 
-    public static function getRecordRouteBindingEloquentQuery(): Builder
-    {
-        return parent::getRecordRouteBindingEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
-    }
+  public static function getRecordRouteBindingEloquentQuery(): Builder
+  {
+    return parent::getRecordRouteBindingEloquentQuery()
+      ->withoutGlobalScopes([
+        SoftDeletingScope::class,
+      ]);
+  }
 }
